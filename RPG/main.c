@@ -14,21 +14,20 @@ struct Nave
 struct Nave naves[4] = {
         {"Astro", 18, 15, 120},
         {"Apollo", 25, 10, 100},
-        {"Sombra", 13, 15, 150},
+        {"Sombra", 18, 15, 150},
         {"Umbra", 19, 15, 105}
         };
 
 
 void ataque(struct Nave *nave1, struct Nave *nave2);
 void status(struct Nave nave1, struct Nave nave2);
-int vitoria(struct Nave nave1, struct Nave nave2);
+int vitoria(struct Nave nave);
 int main(void)
 {
     srand(time(0));
     int escolha;
     struct Nave jogador;
     struct Nave computador;
-    int index = rand() % 4;
     
     printf("| %-10s | %-5s | %-5s | %-5s\n", "Nome", "Ataque", "Defesa", "Energia");
     printf("----------------------------------------\n");
@@ -66,22 +65,24 @@ int main(void)
         }
         
         //Seleciona uma da opções aleatoriamente e previne matchup espelhadas
+        int index = rand() % 4;
         while (index == escolha - 1) {
             index = rand() % 4;
         }
         computador = naves[index];
 
         //Inicio da batalha
+        system("cls");
         status(jogador, computador);
         while (jogador.energia > 0 && computador.energia > 0) {
             ataque(&jogador, &computador);
             printf("\n");
-            if (vitoria(jogador, computador) == 0) {
+            if (vitoria(jogador) == 0) {
                 printf("Voce venceu, %s foi derrotado, muito bem piloto!\n", computador.nome);
                 return 0;
             }
             ataque(&computador, &jogador);
-            if (vitoria(computador, jogador) == 0) {
+            if (vitoria(computador) == 0) {
                 printf("%s derrotou voce, mais sorte da proxima piloto!\n", computador.nome);
                 return 0;
             }
@@ -93,10 +94,13 @@ int main(void)
 
 void ataque(struct Nave *nave1, struct Nave *nave2) {
     int dano = nave1->ataque - nave2->defesa;
+    if (dano < 0)
+        dano = 0;
     nave2->energia -= dano;
     if (nave2->energia < 0)
         nave2->energia = 0;
     printf("%s ataca %s causando %d de dano.\n", nave1->nome, nave2->nome, dano);
+    printf("\n");
     status(*nave1, *nave2);
 }
 
@@ -105,8 +109,8 @@ void status(struct Nave nave1, struct Nave nave2) {
     printf("Energia '%s': %d\n",nave2.nome, nave2.energia);
 }
 
-int vitoria(struct Nave nave1, struct Nave nave2) {
-    if (nave2.energia <= 0) {
+int vitoria(struct Nave nave) {
+    if (nave.energia <= 0) {
         return 0;
     }
     else 
