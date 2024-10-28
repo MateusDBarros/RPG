@@ -66,7 +66,7 @@ int main(void)
         }
         
         //Seleciona uma da opções aleatoriamente e previne matchup espelhadas
-        while (index == escolha) {
+        while (index == escolha - 1) {
             index = rand() % 4;
         }
         computador = naves[index];
@@ -75,14 +75,15 @@ int main(void)
         status(jogador, computador);
         while (jogador.energia > 0 && computador.energia > 0) {
             ataque(&jogador, &computador);
+            printf("\n");
             if (vitoria(jogador, computador) == 0) {
                 printf("Voce venceu, %s foi derrotado, muito bem piloto!\n", computador.nome);
-                break;
+                return 0;
             }
             ataque(&computador, &jogador);
             if (vitoria(computador, jogador) == 0) {
                 printf("%s derrotou voce, mais sorte da proxima piloto!\n", computador.nome);
-                break;
+                return 0;
             }
         }
     } while(escolha != 5);
@@ -93,6 +94,8 @@ int main(void)
 void ataque(struct Nave *nave1, struct Nave *nave2) {
     int dano = nave1->ataque - nave2->defesa;
     nave2->energia -= dano;
+    if (nave2->energia < 0)
+        nave2->energia = 0;
     printf("%s ataca %s causando %d de dano.\n", nave1->nome, nave2->nome, dano);
     status(*nave1, *nave2);
 }
