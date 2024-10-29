@@ -1,8 +1,8 @@
 Ainda em processo
 
-# Simulação de Batalha de Naves  (SBN
+# Simulação de Batalha de Espacial  (SBA)
 
-Este projeto é uma simulação de batalha de naves em C. Os jogadores podem escolher uma nave e lutar contra uma nave controlada pelo computador.
+Este projeto é uma simulação de batalha de Espacial em C. Os jogadores podem escolher uma nave e lutar contra uma nave controlada pelo computador.
 
 ## Funcionalidades
 
