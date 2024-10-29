@@ -80,42 +80,41 @@ int main(void)
         }
         computador = naves[index];
         system("cls");
-
+        turno = velocidade(jogador, computador);
         //Inicio da batalha
         do
         {
             status(jogador, computador);
             acaoJogador = P1();
             acaoComputador = P2();
-            if(acaoJogador && acaoComputador == 2) {
+            printf("\n");
+            if(acaoJogador == 2 && acaoComputador == 2) {
                     printf("Ninguem atacou nesse turno!\n");
                     continue;
                 }
-            turno = velocidade(jogador, computador);
+            
             if (turno == 0) {
                 if (acaoJogador == 1) 
                     ataque(&jogador, &computador, acaoComputador);
-                if (acaoJogador == 2)
-                    ataque(&computador, &jogador, acaoJogador);
+                turno == 1;
             }
             else {
                 if (acaoComputador == 1)
                     ataque(&computador, &jogador, acaoJogador);
-                if (acaoComputador == 2)
-                    ataque(&jogador, &computador, acaoComputador);
+                turno = 0;
             }
+
+            //Checa condição de vitoria
             if (vitoria(jogador, computador) == 0) {
                 status(jogador, computador);
                 printf("Voce venceu!\n");
                 return 0;
             }
-            if (vitoria(jogador, computador) == 1) {
+            else if (vitoria(jogador, computador) == 1) {
                 status(jogador, computador);
                 printf("Voce Perdeu, mais sorte da proxima vez!\n");
                 return 0;
             }
-            
-
         } while (jogador.energia != 0 && computador.energia != 0 );
     } while(escolha != 5);
     return 0;
@@ -127,20 +126,18 @@ int P1(void) {
         printf("1. Atacar\n");
         printf("2. Defender\n");
         scanf("%d", &acaoV);
-        switch (acaoV)
-        {
+        switch (acaoV) {
         case 1:
             return 1;
             break;
         case 2:
             return 2;
             break;
-        
         default:
             printf("Opcao invalida\n");
             break;
         }
-    } while(acaoV != 1 || acaoV != 2);  
+    } while(acaoV != 1 && acaoV != 2);  
 }
 
 int P2(void) {
@@ -151,6 +148,8 @@ void ataque(struct Nave *nave1, struct Nave *nave2, int acao) {
     int dano;
     if (acao == 1) { //Ataca normalmente
         nave2->energia -= nave1->ataque;
+        if (nave2->energia < 0)
+            nave2->energia = 0;
         nave2->velocidade -= 2;
         printf("%s ataca %s causando %d de dano.\n", nave1->nome, nave2->nome, nave1->ataque);
         return;
@@ -163,7 +162,7 @@ void ataque(struct Nave *nave1, struct Nave *nave2, int acao) {
         nave2->energia -= dano;
         if (nave2->energia < 0)
             nave2->energia = 0;
-        printf("%s ataca %s causando %d de dano.\n", nave1->nome, nave2->nome, dano);
+        printf("%s defende o ataque de %s, mas sofre %d de dano.\n", nave2->nome, nave1->nome, dano);
     }
 }
 
