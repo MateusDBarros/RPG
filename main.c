@@ -19,13 +19,14 @@ struct Nave naves[4] = {
         {"Umbra", 19, 15, 105, 45}
         };
 
-
-void ataque(struct Nave *nave1, struct Nave *nave2, int acao);
 int P1(void);
 int P2(void);
 void status(struct Nave nave1, struct Nave nave2);
+void ataque(struct Nave *nave1, struct Nave *nave2);
+void defesa(struct Nave *nave1, struct Nave *nave2);
 int velocidade(struct Nave nave1, struct Nave nave2);
 int vitoria(struct Nave nave1, struct Nave nave2);
+
 int main(void)
 {
     srand(time(0));
@@ -45,12 +46,10 @@ int main(void)
         
     }
     do {
-        printf("Escolha sua nave: \n");
+        printf("\n---Escolha sua nave---\n");
         printf("1. Astro\n2. Apollo\n3. Sombra\n4. Umbra\n(Aperte 5 para sair)\n");
         scanf("%d", &escolha);
-
-        switch (escolha)
-        {
+        switch (escolha) {
         case 1:
             jogador = naves[0];
             break;
@@ -69,8 +68,10 @@ int main(void)
             break;
         
         default:
-            printf("opcao invalida!\n");
-            break;
+            system("cls");
+            printf("Opcao invalida!\n");
+            printf("\n");
+            continue;
         }
         
         //Seleciona uma da opções aleatoriamente e previne matchup espelhadas
@@ -79,32 +80,10 @@ int main(void)
             index = rand() % 4;
         }
         computador = naves[index];
-        system("cls");
         turno = velocidade(jogador, computador);
-        //Inicio da batalha
-        do
-        {
-            status(jogador, computador);
-            acaoJogador = P1();
-            acaoComputador = P2();
-            printf("\n");
-            if(acaoJogador == 2 && acaoComputador == 2) {
-                    printf("Ninguem atacou nesse turno!\n");
-                    continue;
-                }
-            
-            if (turno == 0) {
-                if (acaoJogador == 1) 
-                    ataque(&jogador, &computador, acaoComputador);
-                turno == 1;
-            }
-            else {
-                if (acaoComputador == 1)
-                    ataque(&computador, &jogador, acaoJogador);
-                turno = 0;
-            }
+        system("cls");
 
-            //Checa condição de vitoria
+        do {
             if (vitoria(jogador, computador) == 0) {
                 status(jogador, computador);
                 printf("Voce venceu!\n");
@@ -115,6 +94,41 @@ int main(void)
                 printf("Voce Perdeu, mais sorte da proxima vez!\n");
                 return 0;
             }
+            //Inicio da batalha
+            status(jogador, computador);
+            acaoJogador = P1();
+            acaoComputador = P2();
+            printf("\n");
+
+            if(acaoJogador == 2 && acaoComputador == 2) {
+                    printf("Ninguem atacou nesse turno!\n");
+                    continue;
+            }
+            if(acaoJogador == 1 && acaoComputador == 1) {
+                ataque(&jogador, &computador);
+                ataque(&computador, &jogador);
+                if (turno == 0)
+                    turno = 1;
+                else 
+                    turno = 0;
+                continue;
+            }
+
+            if (turno == 0) {
+                if (acaoJogador == 1) 
+                    defesa(&jogador, &computador);
+                else 
+                    defesa(&computador, &jogador);
+                turno == 1;
+                continue;
+            }
+            else {
+                if (acaoComputador == 1)
+                    defesa(&computador, &jogador);
+                turno = 0;
+                continue;
+            }
+
         } while (jogador.energia != 0 && computador.energia != 0 );
     } while(escolha != 5);
     return 0;
@@ -141,31 +155,53 @@ int P1(void) {
 }
 
 int P2(void) {
-    return rand() % 2;
+    return rand() % 2 + 1;
 }
 
-void ataque(struct Nave *nave1, struct Nave *nave2, int acao) {
-    int dano;
-    if (acao == 1) { //Ataca normalmente
-        nave2->energia -= nave1->ataque;
-        if (nave2->energia < 0)
-            nave2->energia = 0;
-        nave2->velocidade -= 2;
-        printf("%s ataca %s causando %d de dano.\n", nave1->nome, nave2->nome, nave1->ataque);
+void ataque(struct Nave *nave1, struct Nave *nave2) {
+     //Ataca normalmente
+    nave2->energia -= nave1->ataque;
+    if (nave2->energia < 0)
+        nave2->energia = 0;
+    nave2->velocidade -= 2;
+    printf("%s ataca %s causando %d de dano.\n", nave1->nome, nave2->nome, nave1->ataque);
+    if (vitoria(*nave1, *nave2) == 0) {
+        status(*nave1, *nave2);
+        printf("Voce venceu!\n");
         return;
     }
-    else {
-        dano = nave1->ataque - nave2->defesa;
-        nave2->velocidade - 1;
-        if (dano < 0)
-            dano = 0;
-        nave2->energia -= dano;
-        if (nave2->energia < 0)
-            nave2->energia = 0;
-        printf("%s defende o ataque de %s, mas sofre %d de dano.\n", nave2->nome, nave1->nome, dano);
+    else if (vitoria(*nave1, *nave2) == 1) {
+        status(*nave1, *nave2);
+        printf("Voce Perdeu, mais sorte da proxima vez!\n");
+        return;
     }
+    return;
 }
 
+
+
+void defesa(struct Nave *nave1, struct Nave *nave2) {
+    int dano;
+    dano = nave1->ataque - nave2->defesa;
+    nave2->velocidade - 1;
+    if (dano < 0)
+        dano = 0;
+    nave2->energia -= dano;
+    if (nave2->energia < 0)
+        nave2->energia = 0;
+    printf("%s defende o ataque de %s, mas sofre %d de dano.\n", nave2->nome, nave1->nome, dano);
+    if (vitoria(*nave1, *nave2) == 0) {
+        status(*nave1, *nave2);
+        printf("Voce venceu!\n");
+        return;
+    }
+    else if (vitoria(*nave1, *nave2) == 1) {
+        status(*nave1, *nave2);
+        printf("Voce Perdeu, mais sorte da proxima vez!\n");
+        return;
+    }
+    return;
+}
 int velocidade(struct Nave nave1, struct Nave nave2) {
     if(nave1.velocidade > nave2.velocidade)
         return 0;
