@@ -85,16 +85,7 @@ int main(void)
         system("cls");
 
         do {
-            if (vitoria(jogador, computador) == 0) {
-                status(jogador, computador);
-                printf("Voce venceu!\n");
-                return 0;
-            }
-            else if (vitoria(jogador, computador) == 1) {
-                status(jogador, computador);
-                printf("Voce Perdeu, mais sorte da proxima vez!\n");
-                return 0;
-            }
+            
             //Inicio da batalha
             status(jogador, computador);
             acaoJogador = P1();
@@ -128,6 +119,17 @@ int main(void)
                     defesa(&computador, &jogador);
                 turno = 0;
                 continue;
+            }
+            //Checa as condicoes de vitoria
+            if (vitoria(jogador, computador) == 0) {
+                status(jogador, computador);
+                printf("Voce venceu!\n");
+                return 0;
+            }
+            else if (vitoria(jogador, computador) == 1) {
+                status(jogador, computador);
+                printf("Voce Perdeu, mais sorte da proxima vez!\n");
+                return 0;
             }
 
         } while (jogador.energia != 0 && computador.energia != 0 );
