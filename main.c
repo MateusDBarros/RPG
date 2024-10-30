@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+//Cria a estrutura das naves
 struct Nave
 {
     char nome[25];
